@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/role.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service RoleService {
+  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {}
+}
+
+message ListRolesRequest {}
+
+message ListRolesResponse {
+  repeated Role role = 1;
+}

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a deployment environment, i.e., a template for deploying a trained
+// model scorer.
+message DeploymentEnvironment {
+  // An ID of the entity, unique across all entity types.
+  string id = 1;
+
+  // User readable name of the entity to be displayed in the UIs.
+  string display_name = 2;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 3;
+
+  // Last modification timestamp.
+  google.protobuf.Timestamp last_modified_time = 4;
+
+  // ID of the project the deployment environment is part of.
+  string project_id = 5;
+
+  reserved 6;
+
+  // Unique name of the target environment as defined in Deployer's
+  // configuration file.
+  //
+  // In the simple cases, it is likely that the Deployer would only have
+  // a single K8s environment configured and this would always specify that
+  // particular K8s environment. In general, however, we want to support
+  // multiple target environments, e.g., to support running development
+  // scorers in AWS and production scorer's in on-premise K8s.
+  string deployment_target_name = 7;
+}

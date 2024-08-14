@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/listing.proto";
+import "api/v1/proto/registered_model.proto";
+
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+
+service RegisteredModelService {
+
+  // Registers a given experiment as registered model
+  // This could be a 2 step process. Rather ModelVersionService.registerModelVersion can
+  // be used directly.
+  rpc CreateRegisteredModel(CreateRegisteredModelRequest) returns (CreateRegisteredModelResponse);
+
+  // Searches the registered models based on the given find criteria.
+  rpc ListRegisteredModels(ListRegisteredModelsRequest) returns (ListRegisteredModelsResponse);
+
+  // Gets the registered model for the given model id.
+  rpc GetRegisteredModel(GetRegisteredModelRequest) returns (GetRegisteredModelResponse);
+
+  // Updates the registered model.
+  rpc UpdateRegisteredModel(UpdateRegisteredModelRequest) returns (UpdateRegisteredModelResponse);
+
+  // Deletes the registered model.
+  rpc DeleteRegisteredModel(DeleteRegisteredModelRequest) returns (DeleteRegisteredModelResponse);
+
+  // Delete more than one registered model.
+  rpc BatchDeleteRegisteredModel(BatchDeleteRegisteredModelRequest) returns (BatchDeleteRegisteredModelResponse);
+
+  // Count the number of registered models.
+  rpc CountRegisteredModels(CountRegisteredModelRequest) returns (CountRegisteredModelResponse);
+
+  rpc GetRegisteredModelByName(GetRegisteredModelByNameRequest) returns (GetRegisteredModelByNameResponse);
+}
+
+message CreateRegisteredModelResponse {
+  RegisteredModel registered_model = 1;
+}
+
+message GetRegisteredModelResponse {
+  RegisteredModel registered_model = 1;
+}
+
+message UpdateRegisteredModelResponse {
+  RegisteredModel registered_model = 1;
+}
+
+message ListRegisteredModelsRequest {
+  // ID of the project from which the listing has to be happen. Required.
+  string project_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message GetRegisteredModelRequest {
+  string model_id = 1;
+}
+
+message CreateRegisteredModelRequest {
+  RegisteredModel registered_model = 1;
+}
+
+message ListRegisteredModelsResponse {
+  repeated RegisteredModel registered_models = 1;
+  PagingResponse paging = 2;
+}
+
+message UpdateRegisteredModelRequest {
+  RegisteredModel registered_model = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message DeleteRegisteredModelRequest {
+  // ID of the registered model to be deleted
+  string model_id = 1;
+}
+
+message DeleteRegisteredModelResponse {
+  // ID of the model that was sent for deletion.
+  string model_id = 1;
+  // Status of the delete operation.
+  bool status = 2;
+  // In case the operation failed, this field would have the message.
+  string message = 3;
+}
+
+message BatchDeleteRegisteredModelRequest {
+  // IDs of the registered models to be deleted.
+  repeated string model_ids = 1;
+}
+
+message BatchDeleteRegisteredModelResponse {
+  repeated DeleteRegisteredModelResponse delete_registered_model_response = 1;
+}
+
+message CountRegisteredModelRequest {
+  string project_id = 1;
+}
+
+message CountRegisteredModelResponse {
+  int32 registered_model_count = 1;
+}
+
+message GetRegisteredModelByNameRequest {
+  string model_name = 1;
+  string project_id = 2;
+}
+
+message GetRegisteredModelByNameResponse {
+  RegisteredModel registered_model = 1;
+}

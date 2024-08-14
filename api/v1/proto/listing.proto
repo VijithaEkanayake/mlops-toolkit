@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/query.proto";
+import "api/v1/proto/value.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Generic paging request portion needed for listing in presence of concurrent
+// modifications.
+message PagingRequest {
+  // Requested number of records to be returned.
+  // Note that fewer records may be returned due to server-side restrictions or
+  // simply if there
+  // are no more records in on the server.
+  int32 page_size = 1;
+  // Use PagingResponse.next_page_token here to continue with the next record
+  // under any given
+  // filter and sorting.
+  bytes page_token = 2;
+}
+
+// Generic paging response portion needed for listing in presence of concurrent
+// modifications.
+message PagingResponse {
+  // An opaque token to be sent together with the next listing request to
+  // continue with the
+  // next record under any given filter and sorting. This token should not be
+  // interpreted by the
+  // client and its structure may change without any prior notice.
+  bytes next_page_token = 1;
+}
+
+// Types of field ordering for listing requests.
+enum Order {
+  // Sort records by the given field in an ascending order natural for its type (default value).
+  ASCENDING = 0;
+  // Sort records by the given field in a descending order natural for its type.
+  DESCENDING = 1;
+}
+
+// Generic sorting request specifying the ordering of a request results from the
+// most to the least
+// important properties.
+message SortingRequest {
+  // List of sorting properties in the decreasing order of importance.
+  //
+  // WARNING: Note that we currently don't support multiple sort properties.
+  repeated SortProperty property = 1;
+}
+
+// Defines a single property to sort requests results on together with the
+// desired ordering
+// direction.
+message SortProperty {
+  // References the property to sort based on.
+  Property property = 1;
+  // Defines the direction of the ordering (ASCENDING vs. DESCENDING).
+  Order order = 2;
+}
+
+// Generic filter request specifying criteria on the request results.
+message FilterRequest { Query query = 1; }
+
+// Structure of the paging token. Clients are not meant to analyze or change the token.
+message Token {
+  // Filter used in the original query. Any follow-up query must use the same filter.
+  FilterRequest filter = 1;
+  // Sorting used in the original query. Any follow-up query must use the same sorting.
+  SortingRequest sorting = 2;
+  // Last value of the field we are sorting on.
+  Value last_sort_value = 3;
+  // Id of the last returned entity. This value is used in case of ties on the sorting value.
+  string last_id = 4;
+}
+
+// Identifies the a set of metadata or metric keys (or key patterns) to include
+// in a response. There is an implicit OR between the patterns and no patterns means don't
+// include anything (default).
+message KeySelection {
+  // Key name or key pattern (if including `%`) to include. The `%` has
+  // the standard SQL `LIKE` meaning and escaping (i.e., `%` means any
+  // possibly empty substring and `%%` means just the character `%`).
+  repeated string pattern = 1;
+}

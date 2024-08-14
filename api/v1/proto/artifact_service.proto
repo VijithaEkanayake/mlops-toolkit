@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/artifact.proto";
+import "api/v1/proto/listing.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service ArtifactService {
+  rpc GetArtifact(GetArtifactRequest) returns (GetArtifactResponse) {}
+  rpc CreateArtifact(CreateArtifactRequest) returns (CreateArtifactResponse) {}
+  rpc UpdateArtifact(UpdateArtifactRequest) returns (UpdateArtifactResponse) {}
+  rpc DeleteArtifact(DeleteArtifactRequest) returns (DeleteArtifactResponse) {}
+  rpc ListEntityArtifacts(ListEntityArtifactsRequest) returns (ListEntityArtifactsResponse) {}
+  // For the upload and download of the artifact data, use the standard
+  // google.bytestream.ByteStream service.
+  // See
+  // https://github.com/googleapis/googleapis/blob/master/google/bytestream/bytestream.proto
+}
+
+message GetArtifactRequest { string id = 1; }
+
+message GetArtifactResponse { Artifact artifact = 1; }
+
+message CreateArtifactRequest { Artifact artifact = 1; }
+
+message CreateArtifactResponse { Artifact artifact = 1; }
+
+message UpdateArtifactRequest {
+  Artifact artifact = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateArtifactResponse { Artifact artifact = 1; }
+
+message DeleteArtifactRequest { string id = 1; }
+
+message DeleteArtifactResponse {}
+
+message ListEntityArtifactsRequest {
+  PagingRequest paging = 1;
+  FilterRequest filter = 2;
+  SortingRequest sorting = 3;
+
+  // ID of the parent entity (required).
+  string entity_id = 4;
+}
+
+message ListEntityArtifactsResponse {
+  PagingResponse paging = 1;
+  repeated Artifact artifact = 2;
+}

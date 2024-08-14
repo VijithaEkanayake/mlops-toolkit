@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+message Project {
+  // An ID of the entity, unique across all entity types.
+  string id = 1;
+
+  // User readable name of the entity to be displayed in the UIs.
+  string display_name = 2;
+
+  // ID of the user owning this entity.
+  string owner_id = 3;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 4;
+
+  // Timestamp of last modification.
+  google.protobuf.Timestamp last_modified_time = 5;
+
+  reserved 6;
+
+  // User provided textual description of the project.
+  string description = 7;
+}

@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/deployment.proto";
+import "api/v1/proto/listing.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service DeploymentService {
+  rpc GetDeployment(GetDeploymentRequest) returns (GetDeploymentResponse) {}
+  rpc ListDeployments(ListDeploymentsRequest)
+      returns (ListDeploymentsResponse) {}
+  rpc CountDeployments(CountDeploymentsRequest)
+      returns (CountDeploymentsResponse) {}
+  rpc UpdateDeployment(UpdateDeploymentRequest)
+      returns (UpdateDeploymentResponse) {}
+  rpc Undeploy(UndeployRequest) returns (google.protobuf.Empty) {}
+  rpc ListAllDeployments(ListAllDeploymentsRequest) returns (ListAllDeploymentsResponse) {}
+}
+
+message GetDeploymentRequest {
+  string deployment_id = 1;
+
+  // If non-empty, the returned Deployment will contain only metadata with
+  // matching keys. Otherwise, no metadata is returned.
+  KeySelection response_metadata = 3;
+}
+
+message GetDeploymentResponse { Deployment deployment = 1; }
+
+message ListDeploymentsRequest {
+  string project_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+
+  // If non-empty, the returned Deployments will contain only metadata with
+  // matching keys. Otherwise, no metadata is returned.
+  KeySelection response_metadata = 5;
+}
+
+message ListDeploymentsResponse {
+  PagingResponse paging = 1;
+  repeated Deployment deployment = 2;
+}
+
+message CountDeploymentsRequest {
+  string project_id = 1;
+  FilterRequest filter = 2;
+}
+
+message CountDeploymentsResponse {
+  int64 count = 1;
+}
+
+message UpdateDeploymentRequest {
+  // Note that field `id` must be filled.
+  //
+  // At the moment only the following fields are mutable:
+  //  - `type`
+  //  - `secondary_scorer`
+  Deployment deployment = 1;
+  google.protobuf.FieldMask update_mask = 2;
+
+  // If non-empty, the returned Deployment will contain only metadata with
+  // matching keys. Otherwise, no metadata is returned.
+  KeySelection response_metadata = 3;
+}
+
+message UpdateDeploymentResponse { Deployment deployment = 1; }
+
+message UndeployRequest { string deployment_id = 1; }
+
+message ListAllDeploymentsRequest {
+  PagingRequest paging = 1;
+  FilterRequest filter = 2;
+  SortingRequest sorting = 3;
+  KeySelection response_metadata = 4;
+}
+
+message ListAllDeploymentsResponse {
+  repeated Deployment deployment = 1;
+  PagingResponse paging = 2;
+}

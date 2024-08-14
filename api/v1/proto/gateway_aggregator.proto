@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/experiment.proto";
+import "api/v1/proto/project.proto";
+import "api/v1/proto/user.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents the aggregated information about a project.
+message ProjectInfo{
+  // Details of the project as provided by the ProjectService.
+  Project project = 1;
+
+  int32 registered_model_count = 2;
+
+  // Count of the number of users the project is shared with as provided by the SharingService.
+  int32 share_count = 3;
+
+  // Count of the number of experiments within the project as provided by the ExperimentService.
+  int64 experiment_count = 4;
+
+  // The information with regards to the users with whom the project has been shared with,
+  // A maximum of 10 user details are provided as part of the response.
+  repeated User shared_user = 5;
+
+  // Count of the number of model versions across all registered models in the project.
+  int32 registered_model_version_count = 6;
+}
+
+message ExperimentInfo {
+
+  // Details of the experiment as provided by the ExperimentService.
+  Experiment experiment = 1;
+  // Details of the registered model version if it is registered.
+  ModelInfo model_info = 2;
+
+}
+
+message ModelInfo {
+  string model_id = 1;
+  string model_name = 2;
+  string model_description = 3;
+  string project_id = 4;
+  string model_owner = 5;
+  string model_version_id = 6;
+  string model_version_number = 7;
+  string model_version_owner = 8;
+}

@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+import "api/v1/proto/entity.proto";
+import "api/v1/proto/tag.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single ML experiment, its metadata, and any artifacts.
+message Experiment {
+  // An ID of the entity, unique across all entity types.
+  string id = 1;
+
+  // User readable name of the entity to be displayed in the UIs.
+  string display_name = 2;
+
+  // ID of the user owning this entity.
+  string owner_id = 3;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 4;
+
+  // Timestamp of last modification.
+  google.protobuf.Timestamp last_modified_time = 5;
+
+  reserved 6;
+
+  // Generic metadata in the form of (key, typed-value) pairs about the entity.
+  // H2O Storage does not interpret contents of the metadata.
+  Metadata metadata = 7;
+
+  // Shared input parameters of an experiment understood by Storage.
+  ExperimentParameters parameters = 8;
+
+  // Current status of the experiment.
+  ExperimentStatus status = 9;
+
+  // Shared statistics about the experiment understood by Storage.
+  ExperimentStatistics statistics = 10;
+
+  // Tags this experiment is annotated with.
+  repeated Tag tag = 11;
+
+  // Description of the experiment.
+  string description = 12;
+
+  enum ExperimentStatus {
+    EXPERIMENT_STATUS_UNSPECIFIED = 0;
+    TRAINING = 1;
+    FINISHED = 2;
+    STOPPING = 3;
+    FAILED = 4;
+    ABORTED = 5;
+  }
+}
+
+// Original configuration parameters of the experiment.
+message ExperimentParameters {
+  reserved 1, 2, 3;
+
+  // If set, contains ID of the dataset used for training.
+  string training_dataset_id = 7;
+
+  // If set, contains ID of the dataset used for validation.
+  string validation_dataset_id = 8;
+
+  // If set, contains ID of the dataset used for testing.
+  string test_dataset_id = 9;
+
+  // The column to predict.
+  string target_column = 4;
+
+  // Column that indicates the observation weight (a.k.a. sample or row weight),
+  // if applicable.
+  string weight_column = 5;
+
+  // Column to use to create stratification folds during (cross-)validation, if
+  // applicable.
+  string fold_column = 6;
+}
+
+// Statistics about the experiment progress & result.
+message ExperimentStatistics {
+  // Duration of model training.
+  google.protobuf.Duration training_duration = 1;
+}

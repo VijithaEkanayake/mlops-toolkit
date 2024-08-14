@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/listing.proto";
+import "api/v1/proto/tag.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service TagService {
+  rpc CreateTag(CreateTagRequest) returns (CreateTagResponse) {}
+  rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse) {}
+  rpc DeleteTag(DeleteTagRequest) returns (google.protobuf.Empty) {}
+  rpc ListTags(ListTagsRequest) returns (ListTagsResponse) {}
+  rpc GetTag(GetTagRequest) returns (GetTagResponse) {}
+}
+
+message CreateTagRequest {
+  Tag tag = 1;
+  reserved 2;
+  string project_id = 3;
+}
+
+message CreateTagResponse { Tag tag = 1; }
+
+message UpdateTagRequest {
+  Tag tag = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateTagResponse { Tag tag = 1; }
+
+message DeleteTagRequest {
+  string id = 1;
+  string project_id = 2;
+}
+
+message ListTagsRequest {
+  reserved 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+  string project_id = 5;
+}
+
+message ListTagsResponse {
+  PagingResponse paging = 1;
+  repeated Tag tag = 2;
+}
+
+message GetTagRequest {
+  string id = 1;
+  string project_id = 2;
+}
+
+message GetTagResponse {
+  Tag tag = 1;
+}

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a generic holder for different value types for metrics and
+// parameters.
+message Value {
+  oneof value {
+    double double_value = 9;
+    string string_value = 10;
+    int64 int64_value = 11;
+    bool bool_value = 12;
+    string json_value = 13;
+    google.protobuf.Timestamp timestamp_value = 14;
+    google.protobuf.Duration duration_value = 15;
+    google.protobuf.Any proto_value = 16; // Not supported yet.
+    string id_value = 17; // Not supported in entity metadata (only in field filters).
+  }
+}

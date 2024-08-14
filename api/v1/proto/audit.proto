@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+import "api/v1/proto/operation.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single event in the history of an entity.
+message AuditEvent {
+  // Unique ID of this event.
+  string id = 1;
+
+  reserved 2;
+
+  // ID of the user that has caused the event (e.g., by performing an operation or an action).
+  string actor_id = 9;
+
+  // ID of the user this event affects (see the `actor` field for the user whose action has caused
+  // the event).
+  string user_id = 3;
+
+  // ID of the user group this event is related to, if any.
+  string group_id = 10;
+
+  // ID of the project this event is related to, if any.
+  string project_id = 4;
+
+  // ID of the experiment this event is related to, if any.
+  string experiment_id = 5;
+
+  // ID of the dataset this event is related to, if any.
+  string dataset_id = 6;
+
+  // ID of the tag this event is related to, if any.
+  string tag_id = 11;
+
+  reserved 12;
+
+  // ID of the comment this event is related to, if any.
+  string comment_id = 13;
+
+  // ID of the deployment this event is related to, if any.
+  string deployment_id = 14;
+
+  // ID of the deployment environment this event is related to, if any.
+  string deployment_environment_id = 15;
+
+  // For some SHARING events, this field captures the role restriction, if set.
+  string restriction_role_id = 16;
+
+  // Textual message describing the event in a human readable form.
+  string message = 7;
+
+  // Event timestamp.
+  google.protobuf.Timestamp timestamp = 8;
+
+  // Operation performed, corresponds 1:1 to permissions and gRPC endpoints.
+  Operation operation = 17;
+
+  // ID of the registered model, if any.
+  string registered_model_id = 18;
+
+  // ID of the registered model version, if any
+  string registered_model_version_id = 19;
+}

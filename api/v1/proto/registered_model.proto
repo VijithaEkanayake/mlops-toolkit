@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+
+message RegisteredModel {
+  // An ID of the registered model.
+  string id = 1;
+  string display_name = 2;
+  string description = 3;
+  string project_id = 4;
+  google.protobuf.Timestamp created_time = 5;
+  // ID of the user owning this model.
+  string created_by = 6;
+  google.protobuf.Timestamp updated_time = 7;
+  // ID of the user last update this model.
+  string updated_by = 8;
+  string status = 9;
+}
+

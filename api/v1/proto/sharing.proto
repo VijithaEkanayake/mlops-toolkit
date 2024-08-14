@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single sharing record for an entity.
+message Sharing {
+  // Unique ID of the sharing record.
+  string id = 1;
+
+  // ID of an entity that is being shared.
+  string entity_id = 2;
+
+  // For project entities, this field is always empty.
+  // For other entities, this field contains the ID of the project sharing
+  // record, where the sharing of the entity originates.
+  string root_sharing_id = 3;
+
+  // If non-empty, an ID of a user to which the access is granted. Cannot be
+  // set at the same time as group.
+  string user_id = 4;
+
+  // If non-empty, an ID of a group to which the access is granted. Cannot be
+  // set at the same time as user.
+  string group_id = 5;
+
+  // If non-empty, restricts the allowed actions resulting from this sharing
+  // record to at most actions allowed by the specified role.
+  string restriction_role_id = 6;
+
+  // Type of the sharing record indicating whether it is managed by Storage or
+  // can be manipulated via the API.
+  SharingType type = 8;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 7;
+}
+
+enum SharingType {
+  SHARING_TYPE_UNSPECIFIED = 0;
+
+  // Sharing directly created by a user. A user created sharing must have
+  // an empty `root_sharing_id` and can be manipulated via the API.
+  USER_CREATED = 1;
+
+  // Sharing representing the owner's implicit sharing. An owner sharing must
+  // have an empty `root_sharing_id` but cannot be manipulated via the API.
+  OWNER = 2;
+
+  // Sharing implied by another sharing. An implied sharing must have its
+  // `root_sharing_id` set to the root sharing, either USER_CREATED or OWNER.
+  IMPLIED = 3;
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single sharing record for an entity.
+message Role {
+  // Unique ID of the role record.
+  string id = 1;
+
+  // Display name of the role.
+  string display_name = 2;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 3;
+}

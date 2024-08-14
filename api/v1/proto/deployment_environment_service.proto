@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/deployment.proto";
+import "api/v1/proto/deployment_environment.proto";
+import "api/v1/proto/entity.proto";
+import "api/v1/proto/listing.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service DeploymentEnvironmentService {
+  rpc GetDeploymentEnvironment(GetDeploymentEnvironmentRequest)
+      returns (GetDeploymentEnvironmentResponse) {}
+  rpc CreateDeploymentEnvironment(CreateDeploymentEnvironmentRequest)
+      returns (CreateDeploymentEnvironmentResponse) {}
+  rpc UpdateDeploymentEnvironment(UpdateDeploymentEnvironmentRequest)
+      returns (UpdateDeploymentEnvironmentResponse) {}
+  rpc DeleteDeploymentEnvironment(DeleteDeploymentEnvironmentRequest)
+      returns (google.protobuf.Empty) {}
+  rpc ListDeploymentEnvironments(ListDeploymentEnvironmentsRequest)
+      returns (ListDeploymentEnvironmentsResponse) {}
+  rpc Deploy(DeployRequest) returns (DeployResponse) {}
+}
+
+message GetDeploymentEnvironmentRequest {
+  string deployment_environment_id = 1;
+}
+
+message GetDeploymentEnvironmentResponse {
+  DeploymentEnvironment deployment_environment = 1;
+}
+
+message CreateDeploymentEnvironmentRequest {
+  DeploymentEnvironment deployment_environment = 1;
+}
+
+message CreateDeploymentEnvironmentResponse {
+  DeploymentEnvironment deployment_environment = 1;
+}
+
+message UpdateDeploymentEnvironmentRequest {
+  // Note that field `id` must be filled.
+  //
+  // At the moment only the following fields are mutable:
+  //  - `display_name`
+  DeploymentEnvironment deployment_environment = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateDeploymentEnvironmentResponse {
+  DeploymentEnvironment deployment_environment = 1;
+}
+
+message DeleteDeploymentEnvironmentRequest {
+  string deployment_environment_id = 1;
+}
+
+message ListDeploymentEnvironmentsRequest {
+  string project_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message ListDeploymentEnvironmentsResponse {
+  PagingResponse paging = 1;
+  repeated DeploymentEnvironment deployment_environment = 2;
+}
+
+message DeployRequest {
+  string experiment_id = 1;
+  string deployment_environment_id = 2;
+  DeploymentType type = 3;
+  repeated SecondaryScorer secondary_scorer = 4;
+
+  // Generic metadata in the form of (key, typed-value) pairs that will be
+  // attached to the deployment
+  // H2O Storage does not interpret contents of the metadata.
+  Metadata metadata = 5;
+
+
+  // If non-empty, the returned Deployment will contain only metadata with
+  // matching keys. Otherwise, no metadata is returned.
+  KeySelection response_metadata = 6;
+}
+
+message DeployResponse { Deployment deployment = 1; }

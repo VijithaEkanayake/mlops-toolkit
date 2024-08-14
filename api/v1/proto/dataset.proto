@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+import "api/v1/proto/entity.proto";
+import "api/v1/proto/tag.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single dataset, i.e., tabular data to run training, fitting,
+// validation,
+// and testing on.
+message Dataset {
+  // An ID of the entity, unique across all entity types.
+  string id = 1;
+
+  // User readable name of the entity to be displayed in the UIs.
+  string display_name = 2;
+
+  // ID of the user owning this entity.
+  string owner_id = 3;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 4;
+
+  // Timestamp of last modification.
+  google.protobuf.Timestamp last_modified_time = 5;
+
+  reserved 6;
+
+  // Generic metadata in the form of (key, typed-value) pairs about the entity.
+  // H2O Storage does not interpret contents of the metadata.
+  Metadata metadata = 7;
+
+  // Number of rows in the dataset.
+  int64 row_count = 8;
+
+  // Number of columns in the dataset.
+  int64 col_count = 9;
+
+  // The actual uncompressed dataset file size in bytes.
+  int64 size = 10;
+
+  // Additional statistics about the dataset. Contains a possibly large blob of
+  // stats not needed
+  // for UI listings. List* methods are not required to fill the field but Get*
+  // methods must.
+  DatasetStats statistics = 11;
+
+  // Tags this dataset is annotated with.
+  repeated Tag tag = 12;
+}
+
+message DatasetStats { repeated Column column = 1; }
+
+message Column {
+  string name = 1;
+  DataType type = 2;
+  ColumnStats stats = 3;
+  repeated DataValue sample_data = 4;
+}
+
+enum DataType {
+  COLUMN_TYPE_UNSPECIFIED = 0;
+  BOOL = 1;
+  INT32 = 2;
+  INT64 = 3;
+  FLOAT32 = 4;
+  FLOAT64 = 5;
+  DATETIME64 = 6;
+  STR = 7;
+  IMAGE = 8;
+}
+
+message DataValue {
+  oneof value {
+    bool bool_value = 1;
+    int32 int32_value = 2;
+    int64 int64_value = 3;
+    float float32_value = 4;
+    double float64_value = 5;
+    // Time value as unix timestamp in millis.
+    int64 datetime64_value = 6;
+    string str_value = 7;
+  }
+}
+
+message ColumnStats {
+  int64 count = 1;
+  int64 unique = 2;
+  int64 freq = 3;
+  int64 num_classes = 4;
+  repeated HistogramEntry histogram = 5;
+
+  oneof stats_type {
+    NumericColumnStats numeric = 6;
+    NonNumericColumnStats non_numeric = 7;
+    TimeColumnStats time = 8;
+  }
+}
+
+message NumericColumnStats {
+  double mean = 1;
+  double std = 2;
+  double min = 3;
+  double max = 4;
+}
+
+message NonNumericColumnStats {
+  // TODO(osery): Should this be of the correct column type? Maybe use the
+  // DataValue type here.
+  string top = 1;
+}
+
+message TimeColumnStats {
+  string format = 1;
+  // Minimal time as unix timestamp in millis.
+  int64 min = 2;
+  // Maximal time as unix timestamp in millis.
+  int64 max = 3;
+}
+
+message HistogramEntry {
+  // TODO(osery): Should these be of the correct column type? Maybe use the
+  // DataValue type here.
+  string tick = 1;
+  int64 count = 2;
+}

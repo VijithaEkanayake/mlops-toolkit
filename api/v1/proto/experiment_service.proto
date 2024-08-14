@@ -1,0 +1,241 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/comment.proto";
+import "api/v1/proto/experiment.proto";
+import "api/v1/proto/listing.proto";
+import "api/v1/proto/metric.proto";
+import "api/v1/proto/value.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service ExperimentService {
+  rpc GetExperiment(GetExperimentRequest) returns (GetExperimentResponse) {}
+  rpc CreateExperiment(CreateExperimentRequest)
+      returns (CreateExperimentResponse) {}
+  rpc UpdateExperiment(UpdateExperimentRequest)
+      returns (UpdateExperimentResponse) {}
+  rpc DeleteExperiment(DeleteExperimentRequest)
+      returns (google.protobuf.Empty) {}
+  rpc ListExperiments(ListExperimentsRequest)
+      returns (ListExperimentsResponse) {}
+  rpc CountExperiments(CountExperimentsRequest)
+      returns (CountExperimentsResponse) {}
+  rpc LinkExperimentIntoProject(LinkExperimentIntoProjectRequest)
+  returns (google.protobuf.Empty) {}
+  rpc UnlinkExperimentFromProject(UnlinkExperimentFromProjectRequest)
+  returns (google.protobuf.Empty) {}
+  rpc TagExperiment(TagExperimentRequest) returns (google.protobuf.Empty) {}
+  rpc UntagExperiment(UntagExperimentRequest) returns (google.protobuf.Empty) {}
+  rpc CreateExperimentComment (CreateExperimentCommentRequest)
+      returns (CreateExperimentCommentResponse) {}
+  rpc ListExperimentComments (ListExperimentCommentsRequest)
+      returns (ListExperimentCommentsResponse) {}
+  rpc CreateExperimentMetric(CreateExperimentMetricRequest)
+      returns (CreateExperimentMetricResponse) {}
+  rpc ListExperimentMetrics(ListExperimentMetricsRequest)
+      returns (ListExperimentMetricsResponse) {}
+  rpc IsExperimentRegistered(IsExperimentRegisteredRequest)
+      returns (IsExperimentRegisteredResponse) {}
+  rpc BatchDeleteExperiment(BatchDeleteExperimentRequest)
+      returns (BatchDeleteExperimentResponse) {}
+  rpc RecoverDeletedExperiment(RecoverDeletedExperimentRequest)
+      returns (RecoverDeletedExperimentResponse) {}
+  rpc BatchRecoverDeletedExperiment(BatchRecoverDeletedExperimentRequest)
+      returns (BatchRecoverDeletedExperimentResponse) {}
+}
+
+message GetExperimentRequest {
+  string id = 1;
+  // If non-empty, the experiments will contain any metadata with matching keys. Otherwise,
+  // no metadata is returned.
+  KeySelection response_metadata = 2;
+}
+
+message GetExperimentResponse { Experiment experiment = 1; }
+
+message CreateExperimentRequest {
+  Experiment experiment = 1;
+  reserved 2;
+  string project_id = 3;
+
+  // If non-empty, the experiments will contain any metadata with matching keys. Otherwise,
+  // no metadata is returned.
+  KeySelection response_metadata = 4;
+}
+
+message CreateExperimentResponse { Experiment experiment = 1; }
+
+message UpdateExperimentRequest {
+  Experiment experiment = 1;
+  google.protobuf.FieldMask update_mask = 2;
+
+  // If non-empty, the experiments will contain any metadata with matching keys. Otherwise,
+  // no metadata is returned.
+  KeySelection response_metadata = 3;
+}
+
+message UpdateExperimentResponse { Experiment experiment = 1; }
+
+message DeleteExperimentRequest {
+  string id = 1;
+  string project_id = 2;
+}
+
+message ListExperimentsRequest {
+  reserved 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+  string project_id = 5;
+
+  // If non-empty, the experiments will contain any metadata with matching keys. Otherwise,
+  // no metadata is returned.
+  KeySelection response_metadata = 6;
+}
+
+message ListExperimentsResponse {
+  PagingResponse paging = 1;
+  repeated Experiment experiment = 2;
+}
+
+message CountExperimentsRequest {
+  reserved 1;
+  FilterRequest filter = 2;
+  string project_id = 3;
+}
+
+message CountExperimentsResponse {
+  int64 count = 1;
+}
+
+message LinkExperimentIntoProjectRequest {
+  string project_id = 1;
+  string experiment_id = 2;
+}
+
+message UnlinkExperimentFromProjectRequest {
+  string project_id = 1;
+  string experiment_id = 2;
+}
+
+message TagExperimentRequest {
+  // ID of the Experiment to tag.
+  string experiment_id = 1;
+
+  // ID of the Tag to assign to the Experiment.
+  // Note that if this is a unique tag, the tag would be atomically removed from the previous
+  // entity, if already used.
+  string tag_id = 2;
+}
+
+message UntagExperimentRequest {
+  // ID of the Experiment to untag.
+  string experiment_id = 1;
+
+  // ID of the Tag to remove from the Experiment.
+  string tag_id = 2;
+}
+
+message CreateExperimentCommentRequest {
+  // ID of the Experiment to comment on.
+  string experiment_id = 1;
+
+  // The actual text of the comment.
+  string comment_message = 2;
+}
+
+message CreateExperimentCommentResponse {
+  Comment comment = 1;
+}
+
+message ListExperimentCommentsRequest {
+  // ID of the experiment whose comments should be listed.
+  string experiment_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message ListExperimentCommentsResponse {
+  PagingResponse paging = 1;
+  repeated Comment comment = 2;
+}
+
+message CreateExperimentMetricRequest {
+  // ID of the Experiment to add metric to.
+  string experiment_id = 1;
+
+  // ID of the Dataset the metric relates to.
+  string dataset_id = 2;
+
+  // Key of the metric unique for the <experiment,dataset> pair.
+  string key = 3;
+
+  // The actual value of the metric.
+  Value value = 4;
+}
+
+message CreateExperimentMetricResponse { Metric metric = 1; }
+
+message ListExperimentMetricsRequest {
+  string experiment_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message ListExperimentMetricsResponse {
+  PagingResponse paging = 1;
+  repeated Metric metric = 2;
+}
+
+message IsExperimentRegisteredRequest {
+  string experiment_id = 1;
+  string project_id = 2;
+}
+
+message IsExperimentRegisteredResponse {
+  bool is_registered = 1;
+}
+
+message DeleteExperimentResponse {
+  string id = 1;
+  bool status = 2;
+  string message = 3;
+  string project_id = 4;
+}
+
+message BatchDeleteExperimentRequest {
+  repeated DeleteExperimentRequest experiment_request = 1;
+}
+
+message BatchDeleteExperimentResponse {
+  repeated DeleteExperimentResponse experiment_delete_response = 1;
+}
+
+message RecoverDeletedExperimentRequest {
+  string experiment_id = 1;
+  string project_id = 2;
+}
+
+message RecoverDeletedExperimentResponse {
+  string experiment_id=1;
+  string project_id=2;
+  bool status=3;
+  string message=4;
+}
+
+message BatchRecoverDeletedExperimentRequest {
+  repeated RecoverDeletedExperimentRequest recover_experiment_requests = 1;
+}
+
+message BatchRecoverDeletedExperimentResponse {
+  repeated RecoverDeletedExperimentResponse recover_experiment_responses = 2;
+}

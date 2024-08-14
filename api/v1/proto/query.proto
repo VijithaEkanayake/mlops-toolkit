@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/value.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Disjunction of multiple constraints.
+message Query {
+  // There is an implicit disjunction, OR, between the query clauses.
+  //
+  // WARNING: Note that we currently don't support disjunction of clauses and an
+  // error will
+  // be returned for requests containing multiple clauses.
+  repeated Clause clause = 1;
+}
+
+// Conjunction of multiple constraints.
+// There is an implicit conjunction, AND, between all the constraints inside.
+message Clause {
+  // Constraints on a values of an entity properties.
+  repeated PropertyConstraint property_constraint = 1;
+  // Constraints on a entity tags.
+  repeated TagConstraint tag_constraint = 2;
+}
+
+// Supported types of comparison operators.
+enum Operator {
+  OPERATOR_UNSPECIFIED = 0;
+  // Operands are equal, corresponding to textual '=' or '=='.
+  EQUAL_TO = 1;
+  // Operands are not equal, corresponding to textual '!=' or '<>'.
+  NOT_EQUAL_TO = 2;
+  // First operand is strictly lesser than the second, corresponding to textual
+  // '<'.
+  LESS_THAN = 3;
+  // First operand is lesser than or equal to the second, corresponding to
+  // textual '<='.
+  LESS_OR_EQUAL_TO = 4;
+  // First operand is strictly greater than the second, corresponding to textual
+  // '>'.
+  GREATER_THAN = 5;
+  // First operand is greater than or equal to the second, corresponding to
+  // textual '>='.
+  GREATER_OR_EQUAL_TO = 6;
+  // First operand contains the second (e.g., a substring).
+  CONTAINS = 7;
+}
+
+message PropertyConstraint {
+  // Specifies field/value of the experiment to be compared.
+  Property property = 1;
+
+  // Comparison operator to be used.
+  Operator operator = 2;
+
+  // Actual value to be compared against.
+  Value value = 3;
+}
+
+// Specifies a property of an entity, i.e., direct field, metadata, or a metric
+// value.
+message Property {
+  oneof property_type {
+    // Name of a direct field of the entity, e.g., 'display_name'.
+    string field = 1;
+
+    // Refers to an entity metadata value.
+    MetadataReference metadata = 2;
+
+    // Refers to a metric value. Only valid for experiment related queries.
+    MetricReference metric = 3;
+  }
+}
+
+message MetadataReference {
+  // Key of the metadata value.
+  string key = 1;
+}
+
+message MetricReference {
+  enum DatasetReference {
+    DATASET_REFERENCE_UNSPECIFIED = 0;
+
+    // References a metric evaluated using the experiments training dataset.
+    // This can be
+    // different for each experiment.
+    TRAINING_DATASET = 1;
+
+    // References a metric evaluated using the experiments testing dataset. This
+    // can be
+    // different for each experiment.
+    TESTING_DATASET = 2;
+
+    // References a metric evaluated using the experiments validation dataset.
+    // This can be
+    // different for each experiment.
+    VALIDATION_DATASET = 3;
+
+    // References a metric evaluated using a particular dataset same for all the
+    // experiments.
+    // If chosen, the 'dataset' field must be set and contain id of that
+    // dataset.
+    CUSTOM_DATASET = 4;
+  }
+
+  // Type of dataset reference. Either relative to the each experiment settings
+  // (training,
+  // testing, validation dataset) or a custom dataset same for all the
+  // experiments.
+  DatasetReference dataset_reference = 1;
+
+  // Id of a custom dataset. Only used when dataset_reference == CUSTOM_DATASET.
+  string dataset_id = 2;
+
+  // Key of the metric value.
+  string key = 3;
+}
+
+// Specifies a constraint for a single tag
+message TagConstraint {
+  // Id of an entity tag.
+  string tag_id = 1;
+
+  // Include/exclude flag.
+  Inclusion inclusion = 2;
+}
+
+// Types of inclusion constraints.
+enum Inclusion {
+  // Must include constraint (default value if unspecified).
+  INCLUDE = 0;
+  // Must not include constraint.
+  EXCLUDE = 1;
+}

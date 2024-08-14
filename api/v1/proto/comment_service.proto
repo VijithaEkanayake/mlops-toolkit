@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/comment.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service CommentService {
+  rpc GetComment (GetCommentRequest) returns (GetCommentResponse) {}
+}
+
+message GetCommentRequest {
+  string id = 1;
+}
+
+message GetCommentResponse {
+  Comment comment = 1;
+}

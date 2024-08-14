@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a large immutable blob of data.
+message Artifact {
+  // Unique ID of the artifact.
+  string id = 1;
+
+  // ID of the parent entity, e.g., an Experiment. Permissions of the parent
+  // entity are used to
+  // authorize users accessing the artifact.
+  string entity_id = 2;
+
+  // Defines type of the artifact in relation to the parent entity.
+  // Each entity type defines certain well-known types with universal meaning,
+  // e.g.,
+  // "dataset" for the Dataset entity containing the actual tabular data. In
+  // addition, ML backends
+  // can define and store additional artifacts for each entity.
+  string type = 3;
+
+  // Determines availability of the artifact data.
+  ArtifactState state = 4;
+
+  // Size of the artifact data at rest in bytes. I.e., if the data is
+  // compressed, the size
+  // represents the size after compression.
+  int64 size = 5;
+
+  // Fingerprint of the artifact data. This can be used, e.g., to see if an
+  // artifact needs
+  // re-uploading (as a new artifact due to immutability).
+  //
+  // TODO(osery): Consider other options here. We don't need to be too flexible,
+  // but shouldn't
+  // be something too slow.
+  bytes md5_digest = 6;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 7;
+  // End of upload timestamp.
+  google.protobuf.Timestamp uploaded_time = 8;
+
+  // URI of physical location of the artifact data.
+  string location = 9;
+
+  // MIME type of the artifact data.
+  string mime_type = 10;
+
+  // Timestamp of last modification.
+  google.protobuf.Timestamp last_modified_time = 11;
+
+  // TODO(osery): Consider storage of tar-balled directories and also
+  // compression.
+
+  // State of the artifact. This only considers how the ArtifactService sees the
+  // artifact and not
+  // the underlying storage system. As a result, the artifact may be in the
+  // state AVAILABLE but
+  // already manually deleted form the underlying S3 storage. Download request
+  // for such an artifact
+  // will fail.
+  enum ArtifactState {
+    UNKNOWN_ARTIFACT_STATE = 0;
+    // The artifact has been successfully uploaded and is available for
+    // download. Note that the download may still fail if the artifact has been
+    // manually deleted from the underlying storage.
+    AVAILABLE = 1;
+
+    // The artifact has been deleted (e.g., by a user or garbage collected) and
+    // is no longer available for download.
+    DELETED = 2;
+
+    // The artifact is still being uploaded and should become available later,
+    // if the upload completes successfully.
+    BEING_UPLOADED = 3;
+
+    // Upload of the artifact has failed and the artifact data is not available.
+    UPLOAD_FAILED = 4;
+
+    // Initial state of the Artifact before the upload even begin.
+    EMPTY = 5;
+  }
+}

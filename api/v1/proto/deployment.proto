@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+import "api/v1/proto/entity.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a deployment of a model scorer.
+message Deployment {
+  // An ID of the entity, unique across all entity types.
+  string id = 1;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 3;
+
+  // Last modification timestamp.
+  google.protobuf.Timestamp last_modified_time = 4;
+
+  // ID of the project the deployment is part of.
+  string project_id = 5;
+
+  // ID of the deployment environment, i.e., a template for the actual
+  // deployment.
+  string deployment_environment_id = 6;
+
+  // ID of the experiment whose model is the primary model of this deployment.
+  // There can be additional models handling a fraction or a copy of the
+  // traffic, e.g., as a part of A/B testing or Champion/Challenger scenario.
+  // See field `secondary_scorer` for these.
+  string experiment_id = 7;
+
+  // Determines the type of request traffic routing. See also field
+  // `secondary_scorer`, which lists the secondary scorers that should also
+  // receive request traffic.
+  DeploymentType type = 8;
+
+  // Additional scorers defined for the deployment. Lists experiment whose
+  // scorer should also receive and/or handle a fraction or copy of the traffic.
+  //
+  // Note that all the experiments have to belong to the same project identified
+  // by `project_id`.
+  repeated SecondaryScorer secondary_scorer = 9;
+
+  // Generic metadata in the form of (key, typed-value) pairs about the entity.
+  // H2O Storage does not interpret contents of the metadata.
+  Metadata metadata = 10;
+
+  // These fields are dedicated for the Deployer service to persist arbitrary
+  // data. Read and write of these fields is bound to extra permissions.
+  string deployer_data_version = 11;
+  bytes deployer_data = 12;
+
+  // Owner of the deployment.
+  string owner_id = 13;
+}
+
+enum DeploymentType {
+  DEPLOYMENT_TYPE_UNSPECIFIED = 0;
+
+  // Only the primary model of the deployment is handling the traffic, no
+  // secondary scorers are allowed.
+  SINGLE_MODEL = 1;
+
+  // The primary model of the deployment is handling all the traffic, but
+  // secondary scorers are specified. The additional scorers are deployed
+  // and receive a copy of the traffic, but their predictions are not used.
+  //
+  // This deployment type is useful to implement the Champion/Challenger
+  // scenario. The primary model scorer, the champion, is used to handle all the
+  // requests. However, the new candidate scorer(s), the challenger, is still
+  // supplied all the requests and its predictions are being monitored for later
+  // evaluation, e.g., as data to sign off replacing the champion, but not
+  // actually used in the scoring response.
+  SHADOW_TRAFFIC = 2;
+
+  // Traffic is split between multiple models with the primary model receiving
+  // the remaining fraction of the traffic after all the secondary scorers are
+  // processed. For example, if there are two secondary scorers with fractions
+  // 0.1 (10%) and 0.2 (20%), the primary model is handling 0.7 (70%) of
+  // the traffic.
+  //
+  // This routing is useful to implement A/B testing, where additional models
+  // being tested handle a  gradually increasing fraction of the traffic. In
+  // contrast with `SHADOW_TRAFFIC`, the predictions of secondary models are
+  // actually used in the scoring responses in the corresponding fractions.
+  SPLIT_TRAFFIC = 3;
+}
+
+// Defines a secondary model that handles a fraction or a copy of the traffic.
+message SecondaryScorer {
+  string experiment_id = 1;
+  double fraction = 2;
+}

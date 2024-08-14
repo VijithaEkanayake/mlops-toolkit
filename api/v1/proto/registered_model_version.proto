@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+
+message RegisteredModelVersion {
+  string id = 1;
+  string registered_model_id = 2;
+  string experiment_id = 3;
+  int32 version = 4;
+  RegisteredModelVersionStatus status = 5;
+  google.protobuf.Timestamp created_time = 6;
+  string created_by = 7;
+  google.protobuf.Timestamp updated_time = 8;
+  string updated_by = 9;
+}
+
+enum RegisteredModelVersionStatus {
+  ACTIVE = 0;
+  INACTIVE = 1;
+  DELETED = 2;
+  PURGE = 3;
+}

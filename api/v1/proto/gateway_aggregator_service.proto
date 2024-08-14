@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/listing.proto";
+import "api/v1/proto/gateway_aggregator.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service GatewayAggregatorServices {
+  rpc GetProjectWithAggregatedInfo(GetProjectWithAggregatedInfoRequest) returns (GetProjectWithAggregatedInfoResponse) {};
+  rpc ListProjectsWithAggregatedInfo(ListProjectsWithAggregatedInfoRequest) returns (ListProjectsWithAggregatedInfoResponse) {};
+  rpc ListExperimentsWithModelInfo(ListExperimentsWithModelInfoRequest) returns (ListExperimentsWithModelInfoResponse) {};
+}
+
+message GetProjectWithAggregatedInfoRequest { string project_id = 1; }
+
+message GetProjectWithAggregatedInfoResponse { ProjectInfo projectInfo = 1; }
+
+message ListProjectsWithAggregatedInfoRequest {
+  PagingRequest paging = 1;
+  FilterRequest filter = 2;
+  SortingRequest sorting = 3;
+}
+
+message ListProjectsWithAggregatedInfoResponse {
+  repeated ProjectInfo projectInfo = 1;
+  PagingResponse paging = 2;
+  int64 user_project_count = 3;
+}
+
+message ListExperimentsWithModelInfoRequest {
+
+  string project_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+
+  // If non-empty, the experiments will contain any metadata with matching keys. Otherwise,
+  // no metadata is returned.
+  KeySelection response_metadata = 5;
+}
+
+message ListExperimentsWithModelInfoResponse {
+  repeated ExperimentInfo experiment_info = 1;
+  PagingResponse paging = 2;
+  int64 experiment_count = 3;
+}
+

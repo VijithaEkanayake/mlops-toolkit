@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/value.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single metric or possibly other metadata about experiment/model
+// bound to an input dataset, e.g., the training or validation dataset.
+//
+// Specific ML backends can also store proprietary scoring information using
+// the json_value or proto_value for the given <experiment,dataset> pair.
+// Information specific to just an experiment is stored in experiment metadata
+// instead.
+message Metric {
+  reserved 1, 2, 3, 4, 5, 6, 7, 8, 9;
+
+  // ID of the experiment this metric belongs to.
+  string experiment_id = 10;
+
+  // ID of the Dataset this metric was based on.
+  string dataset_id = 11;
+
+  // The actual value of the metric. The type of the value is determined by the
+  // metric type.
+  Value value = 12;
+
+  // Uniquely identifies metric for the <experiment,dataset> combination.
+  string key = 13;
+}

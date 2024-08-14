@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/value.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a generic holder for different ML backend specific key value
+// pairs.
+// The keys should identify the ML backend (and where relevant for
+// backward/forward compatibility
+// also a version) such as, e.g, "dai/resumed_experiment" or
+// "dai:1.5.1/model_parameters".
+message Metadata { map<string, Value> values = 1; }

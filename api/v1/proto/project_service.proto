@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/audit.proto";
+import "api/v1/proto/listing.proto";
+import "api/v1/proto/project.proto";
+import "api/v1/proto/sharing.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service ProjectService {
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse) {}
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {}
+  rpc ListProjectsContainingExperiment(ListProjectsContainingExperimentRequest) returns (ListProjectsContainingExperimentResponse) {}
+  rpc ListAllProjects(ListAllProjectsRequest) returns (ListAllProjectsResponse) {}
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {}
+  rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty) {}
+  rpc BatchDeleteProject(BatchDeleteProjectRequest) returns (BatchDeleteProjectResponse) {}
+  rpc ShareProject(ShareProjectRequest) returns (ShareProjectResponse) {}
+  rpc UnshareProject(UnshareProjectRequest) returns (UnshareProjectResponse) {}
+  rpc ListProjectEvents(ListProjectEventsRequest)
+  returns (ListProjectEventsResponse) {}
+  rpc ListProjectSharings(ListProjectSharingsRequest)
+  returns (ListProjectSharingsResponse) {}
+  rpc TransferProjectOwnership(TransferProjectOwnershipRequest) returns (TransferProjectOwnershipResponse) {}
+}
+
+message GetProjectRequest { string project_id = 1; }
+
+message GetProjectResponse { Project project = 1; }
+
+message ListProjectsRequest {
+  reserved 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message ListProjectsResponse {
+  repeated Project project = 1;
+  PagingResponse paging = 2;
+  int64 user_project_count = 3;
+}
+
+message ListProjectsContainingExperimentRequest {
+  string experiment_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message ListProjectsContainingExperimentResponse {
+  repeated Project project = 1;
+
+  PagingResponse paging = 2;
+}
+
+message ListAllProjectsRequest {
+  PagingRequest paging = 1;
+  FilterRequest filter = 2;
+  SortingRequest sorting = 3;
+}
+
+message ListAllProjectsResponse {
+  repeated Project project = 1;
+
+  PagingResponse paging = 2;
+  int64 total_project_count = 3;
+}
+
+message CreateProjectRequest { Project project = 1; }
+
+message CreateProjectResponse { Project project = 1; }
+
+message UpdateProjectRequest {
+  Project project = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateProjectResponse { Project project = 1; }
+
+message DeleteProjectRequest { string project_id = 1; }
+
+message ShareProjectRequest {
+  reserved 1;
+
+  // ID of the project being shared.
+  string project_id = 2;
+
+  // If non-empty, an ID of a user to which the access is granted. Cannot be set
+  // at the same time as group.
+  string user_id = 3;
+
+  // If non-empty, an ID of a group to which the access is granted. Cannot be
+  // set at the same time as user.
+  string group_id = 4;
+
+  // If non-empty, restricts the allowed actions resulting from this sharing
+  // record to at most actions allowed by the specified role.
+  string restriction_role_id = 5;
+}
+
+message ShareProjectResponse {
+  Sharing sharing = 1;
+}
+
+message UnshareProjectRequest {
+  reserved 2;
+
+  // Id of the project being unshared.
+  string project_id = 1;
+  // Id of the sharing
+  string sharing_id = 3;
+}
+
+message UnshareProjectResponse {}
+
+message ListProjectEventsRequest {
+  string project_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message ListProjectEventsResponse {
+  repeated AuditEvent event = 1;
+  PagingResponse paging = 2;
+  int64 event_count = 3;
+}
+
+message ListProjectSharingsRequest {
+  string project_id = 1;
+}
+
+message ListProjectSharingsResponse {
+  repeated Sharing sharing = 1;
+}
+
+message TransferProjectOwnershipRequest {
+  string project_id = 1;
+  string new_owner_id = 2;
+}
+
+message TransferProjectOwnershipResponse {
+  string project_id = 1;
+  string owner_id = 2;
+  bool status = 3;
+}
+
+message BatchDeleteProjectRequest {
+  // List of Project IDs to be deleted.
+  repeated string project_ids = 1;
+}
+
+message DeleteProjectResponse {
+  // ID of the project.
+  string project_id = 1;
+  // Status of the delete operation - true or false.
+  bool status = 2;
+  // Error message if the status is false.
+  string message = 3;
+}
+
+message BatchDeleteProjectResponse {
+  repeated DeleteProjectResponse projects_deleted = 1;
+}

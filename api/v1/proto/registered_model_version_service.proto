@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "api/v1/proto/listing.proto";
+import "api/v1/proto/registered_model_version.proto";
+
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+
+service RegisteredModelVersionService {
+
+  // Register the given model version for the specified model id in the message.
+  // If the model id is not provided, a new model and version will be created with the
+  // given name.
+  rpc CreateModelVersion(CreateModelVersionRequest) returns (CreateModelVersionResponse);
+
+  // Gets the model versions for the given model id
+  rpc ListModelVersionsForModel(ListModelVersionsForModelRequest) returns (ListModelVersionsForModelResponse);
+
+  // Gets model version for the given registered model id
+  rpc GetModelVersion(GetModelVersionRequest) returns (GetModelVersionResponse);
+
+  // Gets all the model version(s) for an experiment.
+  rpc GetModelVersionForExperiment(GetModelVersionForExperimentRequest) returns (GetModelVersionForExperimentResponse);
+
+  // Gets model version count for specific model id
+  rpc CountModelVersions(CountModelVersionsRequest) returns (CountModelVersionsResponse);
+
+  // Delete the model version specified by the id.
+  rpc DeleteModelVersion(DeleteModelVersionRequest) returns (DeleteModelVersionResponse);
+
+  // Delete all the model versions specified by their ids.
+  rpc BatchDeleteModelVersion(BatchDeleteModelVersionRequest) returns (BatchDeleteModelVersionResponse);
+}
+
+message  CreateModelVersionRequest {
+  RegisteredModelVersion registered_model_version = 1;
+  // Needed when model_id is not provided.
+  string registered_model_display_name = 2;
+  // Needed when model_id is not provided.
+  string project_id = 3;
+}
+
+message GetModelVersionRequest {
+  string model_version_id = 1;
+}
+
+message GetModelVersionForExperimentRequest{
+  string experiment_id = 1;
+  FilterRequest filter = 2;
+}
+
+message GetModelVersionsByModelRequest {
+  string registered_model_id = 1;
+}
+
+message InactivateModelVersionRequest {
+  repeated string model_version_ids = 1;
+}
+
+message CreateModelVersionResponse {
+  RegisteredModelVersion registered_model_version = 1;
+}
+
+message GetModelVersionResponse {
+  RegisteredModelVersion registered_model_version = 1;
+}
+
+message GetModelVersionForExperimentResponse{
+  repeated RegisteredModelVersion registered_model_version = 1;
+}
+
+message ListModelVersionsForModelResponse {
+  repeated RegisteredModelVersion model_versions = 1;
+  PagingResponse paging = 2;
+}
+
+message ListModelVersionsForModelRequest {
+  string registered_model_id = 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+}
+
+message CountModelVersionsRequest{
+  string registered_model_id = 1;
+}
+
+message CountModelVersionsResponse{
+  int32 count = 1;
+}
+
+message DeleteModelVersionRequest {
+  string id = 1;
+}
+
+message DeleteModelVersionResponse {
+   string id = 1;
+   bool status = 2;
+   string message = 3;
+}
+
+message BatchDeleteModelVersionRequest {
+  repeated string ids = 1;
+}
+
+message BatchDeleteModelVersionResponse {
+  repeated DeleteModelVersionResponse delete_model_version_response = 1;
+}

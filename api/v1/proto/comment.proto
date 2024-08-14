@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+// Represents a single comment.
+message Comment {
+  // Unique ID of this comment.
+  string id = 1;
+
+  // ID of the user that has created the comment.
+  string author_id = 2;
+
+  // ID of the project this comment is attached to, if any.
+  string project_id = 3;
+
+  // ID of the experiment this comment is attached to, if any.
+  string experiment_id = 4;
+
+  // ID of the dataset this comment is attached to, if any.
+  string dataset_id = 5;
+
+  // Textual payload of the comment.
+  string message = 7;
+
+  // Creation timestamp.
+  google.protobuf.Timestamp created_time = 8;
+}

@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package ai.h2o.storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "api/v1/proto/dataset.proto";
+import "api/v1/proto/listing.proto";
+
+option go_package = "github.com/h2oai/h2oai-storage/api/v1/proto";
+option java_multiple_files = true;
+option java_package = "ai.h2o.storage";
+
+service DatasetService {
+  rpc GetDataset(GetDatasetRequest) returns (GetDatasetResponse) {}
+  rpc CreateDataset(CreateDatasetRequest) returns (CreateDatasetResponse) {}
+  rpc UpdateDataset(UpdateDatasetRequest) returns (UpdateDatasetResponse) {}
+  rpc DeleteDataset(DeleteDatasetRequest) returns (google.protobuf.Empty) {}
+  rpc ListDatasets(ListDatasetsRequest) returns (ListDatasetsResponse) {}
+  rpc LinkDatasetIntoProject(LinkDatasetIntoProjectRequest)
+  returns (google.protobuf.Empty) {}
+  rpc UnlinkDatasetFromProject(UnlinkDatasetFromProjectRequest)
+  returns (google.protobuf.Empty) {}
+  rpc TagDataset(TagDatasetRequest) returns (google.protobuf.Empty) {}
+  rpc UntagDataset(UntagDatasetRequest) returns (google.protobuf.Empty) {}
+}
+
+message GetDatasetRequest {
+  string id = 1;
+
+  // If non-empty, the returned dataset will contain only metadata with matching keys.
+  // Otherwise, no metadata is returned.
+  KeySelection response_metadata = 2;
+}
+
+message GetDatasetResponse { Dataset dataset = 1; }
+
+message CreateDatasetRequest {
+  Dataset dataset = 1;
+  reserved 2;
+  string project_id = 3;
+
+  // If non-empty, the returned dataset will contain only metadata with matching keys.
+  // Otherwise, no metadata is returned.
+  KeySelection response_metadata = 4;
+}
+
+message CreateDatasetResponse { Dataset dataset = 1; }
+
+message UpdateDatasetRequest {
+  Dataset dataset = 1;
+  google.protobuf.FieldMask update_mask = 2;
+
+  // If non-empty, the returned dataset will contain only metadata with matching keys.
+  // Otherwise, no metadata is returned.
+  KeySelection response_metadata = 3;
+}
+
+message UpdateDatasetResponse { Dataset dataset = 1; }
+
+message DeleteDatasetRequest { string id = 1; }
+
+message ListDatasetsRequest {
+  reserved 1;
+  PagingRequest paging = 2;
+  FilterRequest filter = 3;
+  SortingRequest sorting = 4;
+  string project_id = 5;
+
+  // If non-empty, the returned datasets will contain only metadata with matching keys.
+  // Otherwise, no metadata is returned.
+  KeySelection response_metadata = 6;
+}
+
+message ListDatasetsResponse {
+  PagingResponse paging = 1;
+  repeated Dataset dataset = 2;
+}
+
+message LinkDatasetIntoProjectRequest {
+  string project_id = 1;
+  string dataset_id = 2;
+}
+
+message UnlinkDatasetFromProjectRequest {
+  string project_id = 1;
+  string dataset_id = 2;
+}
+
+message TagDatasetRequest {
+  // ID of the Dataset to tag.
+  string dataset_id = 1;
+
+  // ID of the Tag to assign to the Dataset.
+  // Note that if this is a unique tag, the tag would be atomically removed from the previous
+  // entity, if already used.
+  string tag_id = 2;
+}
+
+message UntagDatasetRequest {
+  // ID of the Dataset to untag.
+  string dataset_id = 1;
+
+  // ID of the Tag to remove from the Dataset.
+  string tag_id = 2;
+}
