@@ -19,7 +19,7 @@ proto: setup
 
 .PHONY: run
 run:
-	./venv/bin/wave run src.app
+	./venv/bin/python3 mlops_data_fetcher.py
 
 .PHONY: setup-docker
 setup-docker: setup proto

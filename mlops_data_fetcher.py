@@ -1,3 +1,4 @@
+import os
 from typing import List, Tuple
 
 from storage_service import StorageService
@@ -64,7 +65,7 @@ def initialize_storage_service() -> StorageService:
         certificate=open(cert_path).read(),
         key=open(key_path).read(),
         ca=open(ca_path).read(),
-        url="localhost:9999"
+        url=os.getenv("STORAGE_URL")
     )
 
 def main():
