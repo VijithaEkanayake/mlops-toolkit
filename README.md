@@ -4,7 +4,8 @@
 
 ### Prerequisite
 
-1. [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) installed and configured for your cluster
+1. Python 3.10: Ensure that Python 3.10 is installed on your system before running the application.
+2. [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) installed and configured for your cluster
 
 #### Set up the mlops-data-fetcher. 
 
